@@ -1,6 +1,7 @@
 """
 Base settings to build other settings files upon.
 """
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -67,7 +68,8 @@ DJANGO_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     # "django.contrib.humanize", # Handy template tags
-    "django.contrib.admin",
+    # "django.contrib.admin",
+    "config.adminconfig.OmnibackAdminConfig",
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
@@ -79,6 +81,7 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
     "rest_framework",
     "rest_framework.authtoken",
+    "rest_framework_simplejwt",
     "corsheaders",
     "drf_spectacular",
 ]
@@ -143,6 +146,19 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
 ]
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # 'rest_framework.authentication.TokenAuthentication',
+    ],
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
 
 # STATIC
 # ------------------------------------------------------------------------------
@@ -227,7 +243,7 @@ EMAIL_TIMEOUT = 5
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL.
-ADMIN_URL = "admin/"
+ADMIN_URL = "omnibackadmin/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#admins
 ADMINS = [("""George Ogola""", "gogola@omnifood.co.ke")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers

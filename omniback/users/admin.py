@@ -2,6 +2,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import decorators, get_user_model
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from omniback.users.forms import UserAdminChangeForm, UserAdminCreationForm
@@ -16,11 +17,24 @@ if settings.DJANGO_ADMIN_FORCE_ALLAUTH:
 
 @admin.register(User)
 class UserAdmin(auth_admin.UserAdmin):
+    @admin.display(description="Profile Picture")
+    def thumbnail(self, obj):
+        if obj.profile_picture:
+            return format_html(
+                f'<img src="{obj.profile_picture.url}" width="30" height="30" style="border-radius:50%;" alt="Photo">'
+            )
+        else:
+            return format_html(
+                '<img src="{}" width="30" height="30" style="border-radius:50%;" alt="Photo">'.format(
+                    "omniback/static/images/avatars/default.png"
+                )
+            )
+
     form = UserAdminChangeForm
     add_form = UserAdminCreationForm
     fieldsets = (
         (None, {"fields": ("email", "password")}),
-        (_("Personal info"), {"fields": ("name",)}),
+        (_("Personal info"), {"fields": ("first_name", "last_name", "profile_picture")}),
         (
             _("Permissions"),
             {
@@ -35,7 +49,8 @@ class UserAdmin(auth_admin.UserAdmin):
         ),
         (_("Important dates"), {"fields": ("last_login", "date_joined")}),
     )
-    list_display = ["email", "name", "is_superuser"]
+    list_display = ["thumbnail", "first_name", "email", "is_superuser"]
+    list_display_links = ["email"]
     search_fields = ["name"]
     ordering = ["id"]
     add_fieldsets = (
